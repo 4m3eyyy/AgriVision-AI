@@ -5,6 +5,10 @@ export default defineConfig({
     server: { entry: "server" },
   },
 
+  nitro: {
+    preset: "render-com",
+  },
+
   vite: {
     server: {
       host: "0.0.0.0",
