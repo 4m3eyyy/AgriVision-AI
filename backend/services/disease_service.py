@@ -23,18 +23,28 @@ CONFIDENCE_THRESHOLD = 0.70
 
 
 # ============================================================
-# LOAD MODEL
-# ============================================================
-
-model = tf.keras.models.load_model(MODEL_FILE)
-
-
-# ============================================================
 # LOAD DISEASE CLASSES
 # ============================================================
 
 with open(CLASS_FILE, "r", encoding="utf-8") as file:
     class_names = json.load(file)
+
+
+# ============================================================
+# MODEL
+# ============================================================
+
+model = None
+
+
+def get_model():
+
+    global model
+
+    if model is None:
+        model = tf.keras.models.load_model(MODEL_FILE)
+
+    return model
 
 
 # ============================================================
@@ -44,7 +54,6 @@ with open(CLASS_FILE, "r", encoding="utf-8") as file:
 def preprocess_image(image):
 
     image = image.convert("RGB")
-
     image = image.resize((160, 160))
 
     image = np.array(
@@ -66,9 +75,11 @@ def preprocess_image(image):
 
 def predict_disease(image):
 
+    disease_model = get_model()
+
     processed_image = preprocess_image(image)
 
-    predictions = model.predict(
+    predictions = disease_model.predict(
         processed_image,
         verbose=0
     )
@@ -88,7 +99,6 @@ def predict_disease(image):
         2
     )
 
-
     # ========================================================
     # CONFIDENCE CHECK
     # ========================================================
@@ -104,7 +114,6 @@ def predict_disease(image):
                 "Please upload a clear close-up image of the affected leaf."
             )
         }
-
 
     # ========================================================
     # CONFIDENT PREDICTION
